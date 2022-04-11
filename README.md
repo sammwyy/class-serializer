@@ -10,4 +10,4 @@ Class-Serializer is designed to solve that need.
 
 ## Documentation
 
-Read the documentation here. [Read docs](https://github.com/dotphin/ClassSerializer/wiki/Documentation)
+Read the documentation here. [Read docs](https://github.com/dotphin/Class-Serializer/wiki/Documentation)
