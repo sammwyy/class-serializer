@@ -3,7 +3,7 @@
     
     <!-- Artifact information -->
     <groupId>com.dotphin</groupId>
-    <artifactId>Class-Serializer</artifactId>
+    <artifactId>class-serializer</artifactId>
     <packaging>jar</packaging>
 
     <!-- Project Information -->
