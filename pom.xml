@@ -7,9 +7,9 @@
     <packaging>jar</packaging>
 
     <!-- Project Information -->
-    <name>Class-Serializer</name>
+    <name>class-serializer</name>
     <description>Serialize and deserialize classes into maps.</description>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <url>https://github.com/dotphin/ClassSerializer</url>
 
     <properties>

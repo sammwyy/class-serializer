@@ -22,6 +22,30 @@ public class ClassSerializer {
     }
 
     @SuppressWarnings("unchecked")
+    public <S> S deserialize(Object obj, Map<String, Object> values) {
+        Class<?> clazz = obj.getClass();
+
+        Field[] fields = clazz.getFields();
+
+        for (Field field : fields) {
+            String key = this.processor.getFieldName(clazz, field);
+            Object value = values.get(key);
+
+            if (this.processor.shouldDeserializeField(clazz, field, value)) {
+                field.setAccessible(true);
+                
+                try {
+                    field.set(obj, value);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return (S) obj;
+    }
+
+    @SuppressWarnings("unchecked")
     public <S> S deserialize(Class<?> clazz, Map<String, Object> values) {
         Constructor<?> constructor;
         S result;
@@ -34,24 +58,7 @@ public class ClassSerializer {
             return null;
         }
 
-        Field[] fields = clazz.getFields();
-
-        for (Field field : fields) {
-            String key = this.processor.getFieldName(clazz, field);
-            Object value = values.get(key);
-
-            if (this.processor.shouldDeserializeField(clazz, field, value)) {
-                field.setAccessible(true);
-                
-                try {
-                    field.set(result, value);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return result;
+        return this.deserialize(result, values);
     }
 
     public Map<String, Object> serialize (Object object) {
