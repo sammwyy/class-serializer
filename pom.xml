@@ -9,7 +9,7 @@
     <!-- Project Information -->
     <name>Class-Serializer</name>
     <description>Serialize and deserialize classes into maps.</description>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <url>https://github.com/dotphin/ClassSerializer</url>
 
     <properties>
