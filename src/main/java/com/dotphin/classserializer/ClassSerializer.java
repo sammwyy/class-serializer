@@ -31,7 +31,7 @@ public class ClassSerializer {
             String key = this.processor.getFieldName(clazz, field);
             Object value = values.get(key);
 
-            if (this.processor.shouldDeserializeField(clazz, field, value)) {
+            if (value != null && this.processor.shouldDeserializeField(clazz, field, value)) {
                 field.setAccessible(true);
                 
                 try {
@@ -74,7 +74,10 @@ public class ClassSerializer {
                 try {
                     String key = this.processor.getFieldName(clazz, field);
                     Object value = field.get(object);
-                    result.put(key, value);
+                    
+                    if (value != null) {
+                        result.put(key, value);
+                    }
                 } catch (IllegalAccessException | IllegalArgumentException e) {
                     e.printStackTrace();
                 }
