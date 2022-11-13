@@ -10,7 +10,7 @@ import com.dotphin.classserializer.defaults.DefaultClassProcessor;
 
 public class ClassSerializer {
     private ClassProcessor processor;
-    
+
     public ClassSerializer(ClassProcessor processor) {
         this.processor = processor;
     }
@@ -28,16 +28,18 @@ public class ClassSerializer {
         Field[] fields = clazz.getFields();
 
         for (Field field : fields) {
-            String key = this.processor.getFieldName(clazz, field);
-            Object value = values.get(key);
+            if (this.processor.shouldDeserializeField(clazz, field)) {
+                String key = this.processor.getFieldName(clazz, field);
+                Object value = values.get(key);
 
-            if (value != null && this.processor.shouldDeserializeField(clazz, field, value)) {
-                field.setAccessible(true);
-                
-                try {
-                    field.set(obj, value);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
+                if (value != null && this.processor.shouldDeserializeValue(clazz, field, value)) {
+                    field.setAccessible(true);
+
+                    try {
+                        field.set(obj, value);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -53,7 +55,8 @@ public class ClassSerializer {
         try {
             constructor = clazz.getConstructor();
             result = (S) constructor.newInstance();
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
             return null;
         }
@@ -61,12 +64,12 @@ public class ClassSerializer {
         return this.deserialize(result, values);
     }
 
-    public Map<String, Object> serialize (Object object) {
+    public Map<String, Object> serialize(Object object) {
         Class<?> clazz = object.getClass();
         Map<String, Object> result = new HashMap<>();
 
         Field[] fields = clazz.getFields();
-        
+
         for (Field field : fields) {
             if (this.processor.shouldSerializeField(clazz, field)) {
                 field.setAccessible(true);
@@ -74,8 +77,8 @@ public class ClassSerializer {
                 try {
                     String key = this.processor.getFieldName(clazz, field);
                     Object value = field.get(object);
-                    
-                    if (value != null) {
+
+                    if (this.processor.shouldSerializeValue(clazz, field, value)) {
                         result.put(key, value);
                     }
                 } catch (IllegalAccessException | IllegalArgumentException e) {

@@ -7,10 +7,14 @@ import com.dotphin.classserializer.annotations.Prop;
 import com.dotphin.classserializer.annotations.Serializable;
 
 public class DefaultClassProcessor implements ClassProcessor {
+    @Override
+    public boolean shouldDeserializeField(Class<?> clazz, Field field) {
+        return clazz.isAnnotationPresent(Serializable.class) || field.isAnnotationPresent(Prop.class);
+    }
 
     @Override
-    public boolean shouldDeserializeField(Class<?> clazz, Field field, Object value) {
-        return clazz.isAnnotationPresent(Serializable.class) || field.isAnnotationPresent(Prop.class);
+    public boolean shouldDeserializeValue(Class<?> clazz, Field field, Object value) {
+        return true;
     }
 
     @Override
@@ -19,9 +23,14 @@ public class DefaultClassProcessor implements ClassProcessor {
     }
 
     @Override
+    public boolean shouldSerializeValue(Class<?> clazz, Field field, Object value) {
+        return true;
+    }
+
+    @Override
     public String getFieldName(Class<?> clazz, Field field) {
         String key = field.getName();
-        
+
         if (field.isAnnotationPresent(Prop.class)) {
             String annotationKey = field.getAnnotation(Prop.class).key();
 
@@ -32,5 +41,5 @@ public class DefaultClassProcessor implements ClassProcessor {
 
         return key;
     }
-    
+
 }
