@@ -1,4 +1,4 @@
-package com.dotphin.classserializer;
+package com.sammwy.classserializer;
 
 import java.lang.reflect.Field;
 

@@ -1,10 +1,10 @@
-package com.dotphin.classserializer.defaults;
+package com.sammwy.classserializer.defaults;
 
 import java.lang.reflect.Field;
 
-import com.dotphin.classserializer.ClassProcessor;
-import com.dotphin.classserializer.annotations.Prop;
-import com.dotphin.classserializer.annotations.Serializable;
+import com.sammwy.classserializer.ClassProcessor;
+import com.sammwy.classserializer.annotations.Prop;
+import com.sammwy.classserializer.annotations.Serializable;
 
 public class DefaultClassProcessor implements ClassProcessor {
     @Override

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     
     <!-- Artifact information -->
-    <groupId>com.dotphin</groupId>
+    <groupId>com.sammwy</groupId>
     <artifactId>class-serializer</artifactId>
     <packaging>jar</packaging>
 

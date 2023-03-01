@@ -1,4 +1,4 @@
-package com.dotphin.classserializer;
+package com.sammwy.classserializer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dotphin.classserializer.defaults.DefaultClassProcessor;
+import com.sammwy.classserializer.defaults.DefaultClassProcessor;
 
 public class ClassSerializer {
     private ClassProcessor processor;

@@ -1,4 +1,4 @@
-package com.dotphin.classserializer.tests;
+package com.sammwy.classserializer.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -7,15 +7,15 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dotphin.classserializer.ClassSerializer;
-import com.dotphin.classserializer.entities.PropUser;
+import com.sammwy.classserializer.ClassSerializer;
+import com.sammwy.classserializer.entities.SerializableUser;
 
 import org.junit.Test;
 
-public class PropTest {
+public class SerializableTest {
     @Test
     public void serializeTest() {
-        PropUser user = new PropUser();
+        SerializableUser user = new SerializableUser();
         user.name = "Sammwy";
         user.age = 20;
 
@@ -30,14 +30,14 @@ public class PropTest {
         map.put("name", "sammwy");
         map.put("age", 20);
 
-        PropUser user = new ClassSerializer().deserialize(PropUser.class, map);
+        SerializableUser user = new ClassSerializer().deserialize(SerializableUser.class, map);
         assertEquals(user.name, map.get("name"));
         assertEquals(user.age, map.get("age"));
     }
 
     @Test
     public void nullTest() {
-        PropUser user = new PropUser();
+        SerializableUser user = new SerializableUser();
         Map<String, Object> map = new ClassSerializer().serialize(user);
 
         assertTrue(map.containsKey("name"));
