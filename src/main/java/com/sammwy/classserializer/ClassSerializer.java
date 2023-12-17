@@ -1,8 +1,5 @@
 package com.sammwy.classserializer;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +7,11 @@ import com.sammwy.classserializer.defaults.DefaultClassProcessor;
 
 public class ClassSerializer {
     private ClassProcessor processor;
+    private Map<Class<?>, CachedClass<?>> cachedClasses;
 
     public ClassSerializer(ClassProcessor processor) {
         this.processor = processor;
+        this.cachedClasses = new HashMap<>();
     }
 
     public ClassSerializer() {
@@ -22,67 +21,33 @@ public class ClassSerializer {
     }
 
     @SuppressWarnings("unchecked")
-    public <S> S deserialize(Object obj, Map<String, Object> values) {
-        Class<?> clazz = obj.getClass();
+    public <S> CachedClass<S> wrapClass(Class<S> clazz) {
+        CachedClass<S> cachedClass = (CachedClass<S>) this.cachedClasses.get(clazz);
 
-        Field[] fields = clazz.getFields();
-
-        for (Field field : fields) {
-            if (this.processor.shouldSerializeField(clazz, field)) {
-                field.setAccessible(true);
-                String key = this.processor.getFieldName(clazz, field);
-                Object value = values.get(key);
-
-                if (this.processor.shouldSerializeValue(clazz, field, value)) {
-                    this.processor.setFieldValue(clazz, field, value);
-                }
-            }
+        if (cachedClass == null) {
+            cachedClass = new CachedClass<S>(clazz, this.processor);
+            cachedClass.load();
+            this.cachedClasses.put(clazz, cachedClass);
         }
 
-        return (S) obj;
+        return cachedClass;
+    }
 
+    @SuppressWarnings("unchecked")
+    public <S> S deserialize(Object obj, Map<String, Object> values) {
+        CachedClass<S> cached = (CachedClass<S>) this.wrapClass(obj.getClass());
+        return cached.deserialize(obj, values);
     }
 
     @SuppressWarnings("unchecked")
     public <S> S deserialize(Class<?> clazz, Map<String, Object> values) {
-        Constructor<?> constructor;
-        S result;
-
-        try {
-            constructor = clazz.getConstructor();
-            result = (S) constructor.newInstance();
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return this.deserialize(result, values);
+        CachedClass<S> cached = (CachedClass<S>) this.wrapClass(clazz);
+        return cached.deserialize(values);
     }
 
     public Map<String, Object> serialize(Object object) {
-        Class<?> clazz = object.getClass();
-        Map<String, Object> result = new HashMap<>();
-
-        Field[] fields = clazz.getFields();
-
-        for (Field field : fields) {
-            if (this.processor.shouldSerializeField(clazz, field)) {
-                field.setAccessible(true);
-
-                try {
-                    String key = this.processor.getFieldName(clazz, field);
-                    Object value = field.get(object);
-
-                    if (this.processor.shouldSerializeValue(clazz, field, value)) {
-                        result.put(key, value);
-                    }
-                } catch (IllegalAccessException | IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
+        CachedClass<?> cached = this.wrapClass(object.getClass());
+        return cached.serialize(object);
     }
 
     /**

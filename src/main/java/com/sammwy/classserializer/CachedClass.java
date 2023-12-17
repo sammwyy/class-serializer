@@ -1,15 +1,18 @@
 package com.sammwy.classserializer;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CachedClass {
-    private Class<?> clazz;
+public class CachedClass<S> {
+    private Class<S> clazz;
+    private ClassProcessor processor;
     private Map<String, CachedField> fields;
 
-    public CachedClass(Class<?> clazz) {
+    public CachedClass(Class<S> clazz, ClassProcessor processor) {
         this.clazz = clazz;
+        this.processor = processor;
         this.fields = new HashMap<>();
     }
 
@@ -24,20 +27,67 @@ public class CachedClass {
         return allFields;
     }
 
-    public void load(ClassProcessor processor) {
+    public void load() {
         Field[] fields = this.getAllFields();
 
         for (Field field : fields) {
-            boolean serialize = processor.shouldSerializeField(clazz, field);
-            boolean deserialize = processor.shouldDeserializeField(clazz, field);
+            boolean serialize = this.processor.shouldSerializeField(clazz, field);
+            boolean deserialize = this.processor.shouldDeserializeField(clazz, field);
 
             if (serialize || deserialize) {
                 field.setAccessible(true);
 
                 CachedField cachedField = new CachedField(field, processor);
-                String key = processor.getFieldName(clazz, field);
+                String key = this.processor.getFieldName(clazz, field);
+                cachedField.load();
                 this.fields.put(key, cachedField);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public S deserialize(Object obj, Map<String, Object> values) {
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            CachedField cachedField = this.fields.get(key);
+
+            if (cachedField != null && cachedField.shouldDeserialize(value)) {
+                cachedField.setValue(obj, value);
+            }
+        }
+
+        return (S) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    public S deserialize(Map<String, Object> values) {
+        try {
+            Constructor<?> constructor = clazz.getConstructor();
+            S result = (S) constructor.newInstance();
+            return this.deserialize(result, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Map<String, Object> serialize(Object object) {
+        Map<String, Object> result = new HashMap<>();
+
+        for (Map.Entry<String, CachedField> entry : this.fields.entrySet()) {
+            String key = entry.getKey();
+            CachedField cachedField = entry.getValue();
+            Object value = cachedField.getValue(object);
+
+            if (cachedField.shouldSerialize(value)) {
+                Object fixedValue = cachedField.transform(value);
+                cachedField.setValue(object, fixedValue);
+                result.put(key, fixedValue);
+            }
+        }
+
+        return result;
     }
 }

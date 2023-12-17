@@ -24,7 +24,7 @@ public class DefaultClassProcessor implements ClassProcessor {
 
     @Override
     public boolean shouldSerializeValue(Class<?> clazz, Field field, Object value) {
-        return value != null;
+        return true;
     }
 
     @Override
