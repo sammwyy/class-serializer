@@ -24,7 +24,7 @@ public class DefaultClassProcessor implements ClassProcessor {
 
     @Override
     public boolean shouldSerializeValue(Class<?> clazz, Field field, Object value) {
-        return true;
+        return value != null;
     }
 
     @Override
@@ -42,4 +42,25 @@ public class DefaultClassProcessor implements ClassProcessor {
         return key;
     }
 
+    @Override
+    public Object getFieldValue(Object entity, Field field) {
+        Object value = null;
+
+        try {
+            value = field.get(entity);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+    @Override
+    public void setFieldValue(Object entity, Field field, Object value) {
+        try {
+            field.set(entity, value);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }

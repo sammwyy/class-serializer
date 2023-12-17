@@ -28,23 +28,19 @@ public class ClassSerializer {
         Field[] fields = clazz.getFields();
 
         for (Field field : fields) {
-            if (this.processor.shouldDeserializeField(clazz, field)) {
+            if (this.processor.shouldSerializeField(clazz, field)) {
+                field.setAccessible(true);
                 String key = this.processor.getFieldName(clazz, field);
                 Object value = values.get(key);
 
-                if (value != null && this.processor.shouldDeserializeValue(clazz, field, value)) {
-                    field.setAccessible(true);
-
-                    try {
-                        field.set(obj, value);
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                if (this.processor.shouldSerializeValue(clazz, field, value)) {
+                    this.processor.setFieldValue(clazz, field, value);
                 }
             }
         }
 
         return (S) obj;
+
     }
 
     @SuppressWarnings("unchecked")
