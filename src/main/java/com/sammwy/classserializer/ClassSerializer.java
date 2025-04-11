@@ -43,11 +43,17 @@ public class ClassSerializer {
     private String deflateSeparator = null;
 
     /**
+     * Initializes a new ClassSerializer instance.
+     */
+    public ClassSerializer() {
+    }
+
+    /**
      * Sets the field predicate function.
      *
-     * @param fieldPredicate A function that takes a Field and returns the name to
-     *                       use for serialization,
-     *                       or null if the field should not be serialized.
+     * @param predicate A function that takes a Field and returns the name to
+     *                  use for serialization,
+     *                  or null if the field should not be serialized.
      * @return This serializer instance for chaining.
      */
     public ClassSerializer fieldPredicate(BiFunction<Field, Object, String> predicate) {
@@ -154,6 +160,7 @@ public class ClassSerializer {
     /**
      * Deserializes a map back to an object of the specified class.
      *
+     * @param <T>   The type of the object to deserialize.
      * @param clazz The target class.
      * @param map   The map containing serialized data.
      * @return An instance of the specified class with data from the map.

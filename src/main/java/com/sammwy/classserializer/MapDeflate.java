@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 public class MapDeflate {
+    private MapDeflate() {
+    }
 
     /**
      * Flattens a nested map structure into a single-level map.

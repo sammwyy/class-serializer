@@ -9,6 +9,8 @@ import java.lang.reflect.InvocationTargetException;
  * primitive conversion and instance creation.
  */
 public class ClassUtils {
+    private ClassUtils() {
+    }
 
     /**
      * Checks if a class is a primitive type or its wrapper equivalent.
