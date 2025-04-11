@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.sammwy.classserializer.ClassSerializer;
+import com.sammwy.classserializer.ClassSerializer.SkipNull;
 import com.sammwy.classserializer.tests.annotations.Embedded;
 import com.sammwy.classserializer.tests.annotations.Prop;
 import com.sammwy.classserializer.tests.entity.TestPreferences;
@@ -29,6 +30,7 @@ public class PrimitiveSerializerTest {
     @BeforeEach
     public void setUp() {
         serializer = new ClassSerializer()
+                .withSkipNull(SkipNull.NONE)
                 .fieldPredicate((field, obj) -> {
                     if (field.isAnnotationPresent(Prop.class)) {
                         return field.getName();
@@ -142,5 +144,18 @@ public class PrimitiveSerializerTest {
 
         assertNull(user.name);
         assertNull(user.settings);
+    }
+
+    @Test
+    @DisplayName("Handle Null Values In Serialization")
+    public void handleNullValuesInSerialization() {
+        TestUser user = new TestUser();
+        user.name = null;
+
+        Map<String, Object> serialized = serializer.serialize(user);
+
+        assertFalse(serialized.containsKey("ignored"));
+        assertNull(serialized.get("name"));
+        assertTrue(serialized.containsKey("name"));
     }
 }

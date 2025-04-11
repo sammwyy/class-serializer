@@ -43,6 +43,26 @@ public class ClassSerializer {
     private String deflateSeparator = null;
 
     /**
+     * Skip null values when serializing or deserializing
+     */
+    private SkipNull skipNullValues = SkipNull.BOTH;
+
+    public enum SkipNull {
+        BOTH,
+        SERIALIZING,
+        DESERIALIZING,
+        NONE;
+
+        public boolean mustSkipSerialize() {
+            return this == BOTH || this == SERIALIZING;
+        }
+
+        public boolean mustSkipDeserialize() {
+            return this == BOTH || this == DESERIALIZING;
+        }
+    }
+
+    /**
      * Initializes a new ClassSerializer instance.
      */
     public ClassSerializer() {
@@ -98,6 +118,17 @@ public class ClassSerializer {
     }
 
     /**
+     * Sets the skip null values mode.
+     * 
+     * @param mode The mode to set.
+     * @return This serializer instance for chaining.
+     */
+    public ClassSerializer withSkipNull(SkipNull mode) {
+        this.skipNullValues = mode;
+        return this;
+    }
+
+    /**
      * Serializes an object to a map.
      *
      * @param object The object to serialize.
@@ -137,9 +168,12 @@ public class ClassSerializer {
                 field.setAccessible(true);
                 try {
                     Object value = field.get(object);
-                    if (value != null) {
-                        result.put(name, serializeValue(value));
+
+                    if (skipNullValues.mustSkipSerialize() && value == null) {
+                        continue;
                     }
+
+                    result.put(name, serializeValue(value));
                 } catch (IllegalAccessException e) {
                     throw new SerializationException("Error accessing field: " + field.getName(), e);
                 }
